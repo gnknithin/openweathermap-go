@@ -1,0 +1,19 @@
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck     # Catches unhandled errors (crucial in Go)
+    - govet        # Reports suspicious constructs (like bad printf verbs)
+    - gosimple     # Suggests code simplifications
+    - staticcheck  # Advanced static analysis for bugs and performance
+    - unused       # Checks for unused constants, variables, types, or functions
+    - gofmt        # Enforces standard Go formatting rules
+    - misspell     # Catches spelling mistakes in comments/code
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
