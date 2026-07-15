@@ -100,3 +100,33 @@ type ForecastResponse struct {
 	List    []ForecastItem `json:"list"`
 	City    ForecastCity   `json:"city"`
 }
+
+// PollutionComponents holds the individual concentration metrics of chemical pollutants.
+type PollutionComponents struct {
+	CO   float64 `json:"co"`
+	NO   float64 `json:"no"`
+	NO2  float64 `json:"no2"`
+	O3   float64 `json:"o3"`
+	SO2  float64 `json:"so2"`
+	PM25 float64 `json:"pm2_5"`
+	PM10 float64 `json:"pm10"`
+	NH3  float64 `json:"nh3"`
+}
+
+// PollutionMain represents the core Air Quality Index measurement wrapper.
+type PollutionMain struct {
+	AQI int `json:"aqi"` // Air Quality Index: 1 = Good, 2 = Fair, 3 = Moderate, 4 = Poor, 5 = Very Poor
+}
+
+// PollutionItem represents a single data point in the pollution timeline array.
+type PollutionItem struct {
+	Time       int64               `json:"dt"`
+	Main       PollutionMain       `json:"main"`
+	Components PollutionComponents `json:"components"`
+}
+
+// AirPollutionResponse represents the complete payload returned by the Air Pollution API.
+type AirPollutionResponse struct {
+	Coord []float64       `json:"coord"` // Mapped as an array of [lat, lon] matching the JSON response layout
+	List  []PollutionItem `json:"list"`
+}
