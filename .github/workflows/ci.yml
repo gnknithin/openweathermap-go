@@ -29,7 +29,7 @@ jobs:
 
       # 4. Run the enterprise linter step
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9 # 🏆 Upgraded from v6 to v9 for explicit Node 24 runtime support
         with:
           version: v1.61.0 # Standard stable enterprise linter version
           # skip-cache: true # Add this line to bypass the go.sum cache check
