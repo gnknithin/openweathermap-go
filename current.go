@@ -13,7 +13,7 @@ func (c *Client) GetCurrentWeather(ctx context.Context, lat, lon float64) (*Curr
 	// 1. Construct the URL securely using Go's standard url package
 	endpoint, err := url.Parse(fmt.Sprintf("%s/data/2.5/weather", c.baseURL))
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse base URL: %w", err)
+		return nil, fmt.Errorf("failed to parse current weather base URL: %w", err)
 	}
 
 	// 2. Build out the query parameters
@@ -26,27 +26,27 @@ func (c *Client) GetCurrentWeather(ctx context.Context, lat, lon float64) (*Curr
 	// 3. Create the HTTP request bound to our lifecycle Context
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, fmt.Errorf("failed to create current weather request: %w", err)
 	}
 
 	// 4. Execute the network request using our configured client
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
+		return nil, fmt.Errorf("failed to execute current weather request: %w", err)
 	}
 	defer func() {
 		_ = resp.Body.Close()
 	}() // Ensures connection drains and closes to avoid leaks
 
-	// 5. Explicitly check for API/HTTP errors before decoding data
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code from openweathermap: %d", resp.StatusCode)
+	// 5. Call our new centralized error verification loop
+	if err := c.checkResponse(resp); err != nil {
+		return nil, err // Returns our native type-safe APIError directly to the caller!
 	}
 
-	// 6. Decode the streaming body directly into our typed struct
+	// 6. Decode the validated successful response payload stream
 	var result CurrentWeatherResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("failed to decode weather response: %w", err)
+		return nil, fmt.Errorf("failed to decode current weather response: %w", err)
 	}
 
 	return &result, nil

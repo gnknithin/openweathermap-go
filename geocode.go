@@ -13,7 +13,7 @@ import (
 func (c *Client) GeocodeCity(ctx context.Context, cityName string, limit int) ([]GeocodeLocation, error) {
 	endpoint, err := url.Parse(fmt.Sprintf("%s/geo/1.0/direct", c.baseURL))
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse geocode base URL: %w", err)
+		return nil, fmt.Errorf("failed to parse geocoding base URL: %w", err)
 	}
 
 	query := endpoint.Query()
@@ -24,24 +24,25 @@ func (c *Client) GeocodeCity(ctx context.Context, cityName string, limit int) ([
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create geocode request: %w", err)
+		return nil, fmt.Errorf("failed to create geocoding request: %w", err)
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to execute geocode request: %w", err)
+		return nil, fmt.Errorf("failed to execute geocoding request: %w", err)
 	}
 	defer func() {
 		_ = resp.Body.Close() // Satisfies the errcheck linter rule instantly!
 	}()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code from geocoding API: %d", resp.StatusCode)
+	// 🏆 Integrated central error tracking
+	if err := c.checkResponse(resp); err != nil {
+		return nil, err
 	}
 
 	var result []GeocodeLocation
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("failed to decode geocode response: %w", err)
+		return nil, fmt.Errorf("failed to decode geocoding response: %w", err)
 	}
 
 	return result, nil

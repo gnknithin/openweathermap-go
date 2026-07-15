@@ -53,11 +53,12 @@ func (c *Client) Get5DayForecast(ctx context.Context, lat, lon float64, opts *Fo
 		_ = resp.Body.Close() // Keep our linter smiling
 	}()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code from forecast API: %d", resp.StatusCode)
+	// 5. Integrated central error tracking
+	if err := c.checkResponse(resp); err != nil {
+		return nil, err
 	}
 
-	// 5. Stream parse directly into the composed struct
+	// 6. Stream parse directly into the composed struct
 	var result ForecastResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, fmt.Errorf("failed to decode forecast response: %w", err)

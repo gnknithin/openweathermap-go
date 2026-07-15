@@ -31,7 +31,7 @@ func (c *Client) GetOneCallWeather(ctx context.Context, lat, lon float64, opts *
 	// 1. Target the modern 3.0/4.0 endpoint path
 	endpoint, err := url.Parse(fmt.Sprintf("%s/data/3.0/onecall", c.baseURL))
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse onecall base URL: %w", err)
+		return nil, fmt.Errorf("failed to parse one call base URL: %w", err)
 	}
 
 	query := endpoint.Query()
@@ -57,24 +57,25 @@ func (c *Client) GetOneCallWeather(ctx context.Context, lat, lon float64, opts *
 	// 3. Prepare and dispatch the HTTP context-bound channel
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create onecall request: %w", err)
+		return nil, fmt.Errorf("failed to create one call request: %w", err)
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to execute onecall request: %w", err)
+		return nil, fmt.Errorf("failed to execute one call request: %w", err)
 	}
 	defer func() {
 		_ = resp.Body.Close()
 	}()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code from onecall API: %d", resp.StatusCode)
+	// 🏆 Integrated central error tracking
+	if err := c.checkResponse(resp); err != nil {
+		return nil, err
 	}
 
 	var result OneCallResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("failed to decode onecall response: %w", err)
+		return nil, fmt.Errorf("failed to decode one call response: %w", err)
 	}
 
 	return &result, nil

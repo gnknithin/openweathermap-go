@@ -13,7 +13,7 @@ func (c *Client) GetAirPollution(ctx context.Context, lat, lon float64) (*AirPol
 	// 1. Target the standard 2.5 air pollution endpoint path
 	endpoint, err := url.Parse(fmt.Sprintf("%s/data/2.5/air_pollution", c.baseURL))
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse pollution base URL: %w", err)
+		return nil, fmt.Errorf("failed to parse air pollution base URL: %w", err)
 	}
 
 	query := endpoint.Query()
@@ -25,26 +25,26 @@ func (c *Client) GetAirPollution(ctx context.Context, lat, lon float64) (*AirPol
 	// 2. Create context-bound network request
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create pollution request: %w", err)
+		return nil, fmt.Errorf("failed to create air pollution request: %w", err)
 	}
 
 	// 3. Dispatch execution
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to execute pollution request: %w", err)
+		return nil, fmt.Errorf("failed to execute air pollution request: %w", err)
 	}
 	defer func() {
 		_ = resp.Body.Close()
 	}()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code from pollution API: %d", resp.StatusCode)
+	// 🏆 Integrated central error tracking
+	if err := c.checkResponse(resp); err != nil {
+		return nil, err
 	}
 
-	// 4. Stream decode the payload directly into our response structure
 	var result AirPollutionResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("failed to decode pollution response: %w", err)
+		return nil, fmt.Errorf("failed to decode air pollution response: %w", err)
 	}
 
 	return &result, nil
