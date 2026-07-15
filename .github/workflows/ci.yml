@@ -37,6 +37,9 @@ jobs:
         with:
           version: v2.5.0 # 🏆 Upgraded to v2 to comply with modern runner requirements
           # skip-cache: true # Add this line to bypass the go.sum cache check
+          # 🏆 These parameters force the runner to store the binary in the runner cache directory
+          cache: true
+          skip-save-cache: false
 
       # 5. Run the entire unit test suite
       - name: Run Unit Tests
