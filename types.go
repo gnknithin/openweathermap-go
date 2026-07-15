@@ -69,3 +69,34 @@ type OneCallResponse struct {
 	Current        PointInTimeWeather   `json:"current"`
 	Hourly         []PointInTimeWeather `json:"hourly"`
 }
+
+// ForecastItem represents a single 3-hour weather prediction block in the forecast timeline.
+type ForecastItem struct {
+	Time       int64                `json:"dt"`
+	Main       MainStats            `json:"main"`    // 🏆 Reused!
+	Weather    []WeatherDescription `json:"weather"` // 🏆 Reused!
+	Visibility int                  `json:"visibility"`
+	Pop        float64              `json:"pop"` // Probability of precipitation
+	TimeText   string               `json:"dt_txt"`
+}
+
+// ForecastCity represents the metadata about the city being forecasted.
+type ForecastCity struct {
+	ID         int         `json:"id"`
+	Name       string      `json:"name"`
+	Coord      Coordinates `json:"coord"` // 🏆 Reused!
+	Country    string      `json:"country"`
+	Population int         `json:"population"`
+	Timezone   int         `json:"timezone"`
+	Sunrise    int64       `json:"sunrise"`
+	Sunset     int64       `json:"sunset"`
+}
+
+// ForecastResponse represents the complete response from the 5-Day/3-Hour Forecast API.
+type ForecastResponse struct {
+	Cod     string         `json:"cod"`
+	Message int            `json:"message"`
+	Cnt     int            `json:"cnt"` // Number of timestamps returned (usually 40)
+	List    []ForecastItem `json:"list"`
+	City    ForecastCity   `json:"city"`
+}
