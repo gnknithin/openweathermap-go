@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [ main ]
 
+# 🏆 Establishing the official environment toggles at the workflow root level
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
