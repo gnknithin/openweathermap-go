@@ -14,11 +14,11 @@ jobs:
     steps:
       # 1. Check out the repository code onto the runner
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # Keep v4, but GitHub's default runner logic will pull the node24 patch automatically
 
       # 2. Setup the exact Go environment matching your local setup
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6 # 🏆 Upgraded from v5 to v6 for native Node 24 mapping support
         with:
           go-version: '1.25.0'
           cache: true # Automatically caches Go modules to make runs faster
