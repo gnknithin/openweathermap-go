@@ -130,3 +130,14 @@ type AirPollutionResponse struct {
 	Coord []float64       `json:"coord"` // Mapped as an array of [lat, lon] matching the JSON response layout
 	List  []PollutionItem `json:"list"`
 }
+
+// MapLayer defines the custom string type for available OpenWeatherMap map layers.
+type MapLayer string
+
+const (
+	LayerClouds        MapLayer = "clouds_new"
+	LayerPrecipitation MapLayer = "precipitation_new"
+	LayerPressure      MapLayer = "pressure_new"
+	LayerWind          MapLayer = "wind_new"
+	LayerTemperature   MapLayer = "temp_new"
+)
