@@ -32,7 +32,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.61.0 # Standard stable enterprise linter version
-          skip-cache: true # Add this line to bypass the go.sum cache check
+          # skip-cache: true # Add this line to bypass the go.sum cache check
 
       # 5. Run the entire unit test suite
       - name: Run Unit Tests
