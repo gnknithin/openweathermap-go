@@ -32,3 +32,12 @@ type CurrentWeatherResponse struct {
 	Name    string               `json:"name"`
 	Cod     int                  `json:"cod"`
 }
+
+// GeocodeLocation represents a geographical location entry returned by the Geocoding API.
+type GeocodeLocation struct {
+	Name      string  `json:"name"`
+	Latitude  float64 `json:"lat"`
+	Longitude float64 `json:"lon"`
+	Country   string  `json:"country"`
+	State     string  `json:"state,omitempty"` // omitempty handles states not applicable outside certain countries
+}
