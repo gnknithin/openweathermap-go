@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 	"time"
 
@@ -77,6 +76,7 @@ func TestGetCurrentWeather_Success(t *testing.T) {
 func TestGetCurrentWeather_FailureStatus(t *testing.T) {
 	// 1. Set up a mock server that explicitly returns an HTTP 401 Unauthorized error
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
 		_, _ = w.Write([]byte(`{"cod":401, "message": "Invalid API key"}`))
 	}))
@@ -94,7 +94,7 @@ func TestGetCurrentWeather_FailureStatus(t *testing.T) {
 
 	response, err := client.GetCurrentWeather(ctx, 44.34, 10.99)
 
-	// 4. Assertions: This time, we EXPECT an error and NO response
+	// 4. Assertions: Expect an error and NO response structure
 	if err == nil {
 		t.Fatalf("expected an error due to 401 status code, got nil")
 	}
@@ -103,9 +103,19 @@ func TestGetCurrentWeather_FailureStatus(t *testing.T) {
 		t.Errorf("expected response to be nil on failure, got %v", response)
 	}
 
-	// 5. Verify our custom error message wrapping is working
-	expectedErrSubstring := "unexpected status code from openweathermap: 401"
-	if !strings.Contains(err.Error(), expectedErrSubstring) {
-		t.Errorf("expected error message to contain '%s', got '%s'", expectedErrSubstring, err.Error())
+	// 5. 🏆 Gold-Standard Type Assertion Verification
+	// We check if the error is exactly the custom *APIError type we defined
+	apiErr, ok := err.(*openweathermap.APIError)
+	if !ok {
+		t.Fatalf("expected returned error to be type *openweathermap.APIError, got %T", err)
+	}
+
+	if apiErr.Code != 401 {
+		t.Errorf("expected APIError.Code to be 401, got %d", apiErr.Code)
+	}
+
+	expectedMsg := "Invalid API key"
+	if apiErr.Message != expectedMsg {
+		t.Errorf("expected APIError.Message to be '%s', got '%s'", expectedMsg, apiErr.Message)
 	}
 }
