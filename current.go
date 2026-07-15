@@ -34,7 +34,9 @@ func (c *Client) GetCurrentWeather(ctx context.Context, lat, lon float64) (*Curr
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close() // Ensures connection drains and closes to avoid leaks
+	defer func() {
+		_ = resp.Body.Close()
+	}() // Ensures connection drains and closes to avoid leaks
 
 	// 5. Explicitly check for API/HTTP errors before decoding data
 	if resp.StatusCode != http.StatusOK {
