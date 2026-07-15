@@ -1,0 +1,38 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    name: Lint and Test Go Code
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the repository code onto the runner
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Setup the exact Go environment matching your local setup
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.0'
+          cache: true # Automatically caches Go modules to make runs faster
+
+      # 3. Download dependencies securely
+      - name: Install Dependencies
+        run: go mod download
+
+      # 4. Run the enterprise linter step
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.61.0 # Standard stable enterprise linter version
+
+      # 5. Run the entire unit test suite
+      - name: Run Unit Tests
+        run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
