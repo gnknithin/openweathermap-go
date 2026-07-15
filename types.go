@@ -41,3 +41,31 @@ type GeocodeLocation struct {
 	Country   string  `json:"country"`
 	State     string  `json:"state,omitempty"` // omitempty handles states not applicable outside certain countries
 }
+
+// PointInTimeWeather represents the common meteorological metrics returned for a specific timestamp.
+type PointInTimeWeather struct {
+	Time       int64                `json:"dt"`
+	Sunrise    int64                `json:"sunrise,omitempty"`
+	Sunset     int64                `json:"sunset,omitempty"`
+	Temp       float64              `json:"temp"`
+	FeelsLike  float64              `json:"feels_like"`
+	Pressure   int                  `json:"pressure"`
+	Humidity   int                  `json:"humidity"`
+	DewPoint   float64              `json:"dew_point"`
+	UVI        float64              `json:"uvi"`
+	Clouds     int                  `json:"clouds"`
+	Visibility int                  `json:"visibility"`
+	WindSpeed  float64              `json:"wind_speed"`
+	WindDeg    int                  `json:"wind_deg"`
+	Weather    []WeatherDescription `json:"weather"` // 🏆 Reusing our existing structure!
+}
+
+// OneCallResponse represents the massive payload returned by the One Call API.
+type OneCallResponse struct {
+	Latitude       float64              `json:"lat"`
+	Longitude      float64              `json:"lon"`
+	Timezone       string               `json:"timezone"`
+	TimezoneOffset int                  `json:"timezone_offset"`
+	Current        PointInTimeWeather   `json:"current"`
+	Hourly         []PointInTimeWeather `json:"hourly"`
+}
