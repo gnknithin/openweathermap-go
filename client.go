@@ -16,30 +16,40 @@ type Client struct {
 	httpClient *http.Client
 }
 
-// Option defines a function type used to configure the Client.
-type Option func(*Client)
+// ClientOption defines a function type used to configure the Client.
+type ClientOption func(*Client)
 
-// NewClient initializes and returns a new OpenWeatherMap SDK client.
-func NewClient(apiKey string, opts ...Option) *Client {
-	// 1. Establish enterprise defaults
+// NewClient initializes a configuration-validated Client pointer targeting OpenWeatherMap.
+func NewClient(apiKey string, opts ...ClientOption) *Client {
 	c := &Client{
 		apiKey:  apiKey,
-		baseURL: defaultBaseURL,
+		baseURL: "https://api.openweathermap.org",
 		httpClient: &http.Client{
-			Timeout: 10 * time.Second, // Prevents production goroutine leaks
+			Timeout: 10 * time.Second,
 		},
 	}
 
-	// 2. Evaluate any functional options passed by the caller
 	for _, opt := range opts {
 		opt(c)
+	}
+
+	// 🏆 Wrap the existing client transport with our enterprise retry engine!
+	baseTransport := c.httpClient.Transport
+	if baseTransport == nil {
+		baseTransport = http.DefaultTransport
+	}
+
+	c.httpClient.Transport = &retryableTransport{
+		next:       baseTransport,
+		maxRetries: 3,
+		baseDelay:  100 * time.Millisecond,
 	}
 
 	return c
 }
 
 // WithHTTPClient allows overriding the default internal HTTP client.
-func WithHTTPClient(customClient *http.Client) Option {
+func WithHTTPClient(customClient *http.Client) ClientOption {
 	return func(c *Client) {
 		if customClient != nil {
 			c.httpClient = customClient
@@ -48,7 +58,7 @@ func WithHTTPClient(customClient *http.Client) Option {
 }
 
 // WithBaseURL allows overriding the base URL (useful for mocking/testing).
-func WithBaseURL(url string) Option {
+func WithBaseURL(url string) ClientOption {
 	return func(c *Client) {
 		if url != "" {
 			c.baseURL = url
