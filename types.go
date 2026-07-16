@@ -162,3 +162,19 @@ type StationResponse struct {
 	Rank       int     `json:"rank"`
 	CreatedAt  string  `json:"created_at"`
 }
+
+// SolarIrradianceItem represents detailed clear-sky and cloudy conditions radiation indexes.
+type SolarIrradianceItem struct {
+	Time  int64   `json:"dt"`
+	GHI   float64 `json:"ghi"`   // Global Horizontal Irradiance (W/m²)
+	DNI   float64 `json:"dni"`   // Direct Normal Irradiance (W/m²)
+	DHI   float64 `json:"dhi"`   // Diffuse Horizontal Irradiance (W/m²)
+	Clear float64 `json:"clear"` // Clear sky horizontal radiation matrix
+}
+
+// SolarIrradianceResponse holds the complete timeline sequence payload for radiation requests.
+type SolarIrradianceResponse struct {
+	Lat  float64               `json:"lat"`
+	Lon  float64               `json:"lon"`
+	List []SolarIrradianceItem `json:"list"`
+}
