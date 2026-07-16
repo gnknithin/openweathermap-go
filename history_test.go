@@ -19,7 +19,7 @@ func TestGetHistoricalWeather_Success(t *testing.T) {
 		"timezone_offset": -14400,
 		"data": [
 			{
-				"dt": 169b2b5600,
+				"dt": 1691215600,
 				"temp": 294.15,
 				"feels_like": 294.50,
 				"pressure": 1012,
