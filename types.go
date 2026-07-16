@@ -141,3 +141,24 @@ const (
 	LayerWind          MapLayer = "wind_new"
 	LayerTemperature   MapLayer = "temp_new"
 )
+
+// StationRegisterRequest contains the payload fields required to register a new physical weather station.
+type StationRegisterRequest struct {
+	ExternalID string  `json:"external_id"` // Developer's internal system ID reference
+	Name       string  `json:"name"`
+	Latitude   float64 `json:"latitude"`
+	Longitude  float64 `json:"longitude"`
+	Altitude   float64 `json:"altitude"`
+}
+
+// StationResponse represents the server metadata returned upon successful creation or retrieval of a station.
+type StationResponse struct {
+	ID         string  `json:"id"` // OpenWeatherMap's globally unique generated station ID
+	ExternalID string  `json:"external_id"`
+	Name       string  `json:"name"`
+	Latitude   float64 `json:"latitude"`
+	Longitude  float64 `json:"longitude"`
+	Altitude   float64 `json:"altitude"`
+	Rank       int     `json:"rank"`
+	CreatedAt  string  `json:"created_at"`
+}
