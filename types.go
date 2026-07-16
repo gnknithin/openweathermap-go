@@ -178,3 +178,30 @@ type SolarIrradianceResponse struct {
 	Lon  float64               `json:"lon"`
 	List []SolarIrradianceItem `json:"list"`
 }
+
+// HistoricalWeatherItem represents the weather metrics recorded at a specific moment in history.
+type HistoricalWeatherItem struct {
+	Time       int64                `json:"dt"`
+	Sunrise    int64                `json:"sunrise,omitempty"`
+	Sunset     int64                `json:"sunset,omitempty"`
+	Temp       float64              `json:"temp"`
+	FeelsLike  float64              `json:"feels_like"`
+	Pressure   int                  `json:"pressure"`
+	Humidity   int                  `json:"humidity"`
+	DewPoint   float64              `json:"dew_point"`
+	UVI        float64              `json:"uvi,omitempty"`
+	Clouds     int                  `json:"clouds"`
+	Visibility int                  `json:"visibility,omitempty"`
+	WindSpeed  float64              `json:"wind_speed"`
+	WindDeg    int                  `json:"wind_deg"`
+	Weather    []WeatherDescription `json:"weather"` // 🏆 Reused!
+}
+
+// HistoricalWeatherResponse represents the payload returned by the Time Machine historical weather API.
+type HistoricalWeatherResponse struct {
+	Lat            float64                 `json:"lat"`
+	Lon            float64                 `json:"lon"`
+	Timezone       string                  `json:"timezone"`
+	TimezoneOffset int                     `json:"timezone_offset"`
+	Data           []HistoricalWeatherItem `json:"data"`
+}
