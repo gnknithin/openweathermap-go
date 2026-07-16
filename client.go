@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-const defaultBaseURL = "https://api.openweathermap.org"
-
 // Client is the core SDK structure used to communicate with OpenWeatherMap APIs.
 type Client struct {
 	apiKey     string
