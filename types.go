@@ -205,3 +205,16 @@ type HistoricalWeatherResponse struct {
 	TimezoneOffset int                     `json:"timezone_offset"`
 	Data           []HistoricalWeatherItem `json:"data"`
 }
+
+// FireWeatherIndexItem represents a single data record point inside the FWI evaluation matrix timeline.
+type FireWeatherIndexItem struct {
+	Time int64   `json:"dt"`
+	FWI  float64 `json:"fwi"` // The evaluated Fire Weather Index value scale
+}
+
+// FireWeatherIndexResponse encapsulates the complete structural array payload for FWI requests.
+type FireWeatherIndexResponse struct {
+	Lat  float64                `json:"lat"`
+	Lon  float64                `json:"lon"`
+	List []FireWeatherIndexItem `json:"list"`
+}
