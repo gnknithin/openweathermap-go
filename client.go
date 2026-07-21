@@ -3,9 +3,13 @@ package openweathermap
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 )
+
+// ClientOption defines a function type used to configure the Client.
+type ClientOption func(*Client)
 
 // Client is the core SDK structure used to communicate with OpenWeatherMap APIs.
 type Client struct {
@@ -13,9 +17,6 @@ type Client struct {
 	baseURL    string
 	httpClient *http.Client
 }
-
-// ClientOption defines a function type used to configure the Client.
-type ClientOption func(*Client)
 
 // NewClient initializes a configuration-validated Client pointer targeting OpenWeatherMap.
 func NewClient(apiKey string, opts ...ClientOption) *Client {
@@ -27,11 +28,14 @@ func NewClient(apiKey string, opts ...ClientOption) *Client {
 		},
 	}
 
+	// Apply options first so apiKey and baseURL set correctly
+	c.apiKey = apiKey
+
 	for _, opt := range opts {
 		opt(c)
 	}
 
-	// 🏆 Wrap the existing client transport with our enterprise retry engine!
+	// Wrap the existing client transport with our enterprise retry engine!
 	baseTransport := c.httpClient.Transport
 	if baseTransport == nil {
 		baseTransport = http.DefaultTransport
@@ -84,7 +88,11 @@ func (c *Client) checkResponse(resp *http.Response) error {
 			Message string      `json:"message"`
 		}
 
-		if err := json.NewDecoder(resp.Body).Decode(&openWeatherErr); err == nil {
+		// 🏆 Defensive Hardening: Restrict reading from unvalidated error bodies to 4 KB.
+		// This protects host memory from oversized non-JSON proxy pages (e.g., Cloudflare/Nginx HTML errors) or malicious streams.
+		limitedReader := io.LimitReader(resp.Body, 4096)
+
+		if err := json.NewDecoder(limitedReader).Decode(&openWeatherErr); err == nil {
 			if openWeatherErr.Message != "" {
 				apiErr.Message = openWeatherErr.Message
 			}
