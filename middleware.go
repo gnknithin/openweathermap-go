@@ -3,6 +3,7 @@ package openweathermap
 import (
 	"bytes"
 	"io"
+	"math/rand"
 	"net/http"
 	"time"
 )
@@ -54,11 +55,13 @@ func (t *retryableTransport) RoundTrip(req *http.Request) (*http.Response, error
 			_ = resp.Body.Close()
 		}
 
-		backoffDelay := t.baseDelay * (1 << uint(i))
+		// 🏆 Modern Go 1.20+ thread-safe randomized exponential backoff with jitter
+		jitter := time.Duration(rand.Intn(50)) * time.Millisecond
+		backoffDelay := (t.baseDelay * (1 << uint(i))) + jitter
 
 		select {
 		case <-req.Context().Done():
-			return nil, req.Context().Err() // 🏆 Fixed: Return Context().Err() instead of channel type
+			return nil, req.Context().Err()
 		case <-time.After(backoffDelay):
 		}
 	}
